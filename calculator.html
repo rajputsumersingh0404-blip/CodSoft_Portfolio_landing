@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            color: #3498db;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #ecf0f1;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .calculator-demo {
+            background: #2c30b7a2;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .calc-display {
+            width: 100%;
+            height: 60px;
+            font-size: 2em;
+            text-align: right;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #333;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .calc-btn {
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #555;
+            color: white;
+        }
+
+        .calc-btn:hover {
+            background: #666;
+        }
+
+        .operator {
+            background: #3498db;
+        }
+
+        .equals {
+            background: #2ecc71;
+        }
+
+        .clear {
+            background: #e74c3c;
+        }
+
+        .features {
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .features h2 {
+            color: #3498db;
+            text-align: center;
+        }
+
+        .features ul {
+            padding-left: 20px;
+        }
+
+        .features li {
+            margin: 10px 0;
+            color: #ecf0f1;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculator Project</h1>
+        <p class="subtitle">Interactive Web Calculator Application</p>
+        
+        <div class="calculator-demo">
+            <h2>Calculator Demo</h2>
+            <input type="text" class="calc-display" value="0" readonly aria-label="Calculator display">
+            <div class="calc-buttons">
+                <button class="calc-btn clear">C</button>
+                <button class="calc-btn operator">±</button>
+                <button class="calc-btn operator">%</button>
+                <button class="calc-btn operator">÷</button>
+                
+                <button class="calc-btn">7</button>
+                <button class="calc-btn">8</button>
+                <button class="calc-btn">9</button>
+                <button class="calc-btn operator">×</button>
+                
+                <button class="calc-btn">4</button>
+                <button class="calc-btn">5</button>
+                <button class="calc-btn">6</button>
+                <button class="calc-btn operator">-</button>
+                
+                <button class="calc-btn">1</button>
+                <button class="calc-btn">2</button>
+                <button class="calc-btn">3</button>
+                <button class="calc-btn operator">+</button>
+                
+                <button class="calc-btn">0</button>
+                <button class="calc-btn">.</button>
+                <button class="calc-btn equals">=</button>
+            </div>
+        </div>
+
+        <div class="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Basic arithmetic operations (addition, subtraction, multiplication, division)</li>
+                <li>Advanced functions (percentage, sign change, decimal point)</li>
+                <li>Responsive design that works on all devices</li>
+                <li>Intuitive user interface with visual feedback</li>
+                <li>Error handling for invalid operations</li>
+                <li>Clean and modern design with attractive color scheme</li>
+            </ul>
+        </div>
+
+        <a href="index.html" class="back-button">Back to Portfolio</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const display = document.querySelector('.calc-display');
+            const buttons = document.querySelectorAll('.calc-btn');
+            
+            let currentInput = '0';
+            let previousInput = '';
+            let operation = null;
+            let resetOnNextInput = false;
+            
+            // Update display function
+            function updateDisplay() {
+                display.value = currentInput;
+            }
+            
+            // Format number for display
+            function formatNumber(num) {
+                // Convert to string and handle decimal places
+                const numberString = num.toString();
+                const integerDigits = parseFloat(numberString.split('.')[0]);
+                const decimalDigits = numberString.split('.')[1];
+                
+                let integerDisplay;
+                if (isNaN(integerDigits)) {
+                    integerDisplay = '';
+                } else {
+                    integerDisplay = integerDigits.toLocaleString('en', {maximumFractionDigits: 0});
+                }
+                
+                if (decimalDigits != null) {
+                    return `${integerDisplay}.${decimalDigits}`;
+                } else {
+                    return integerDisplay;
+                }
+            }
+            
+            // Calculate function
+            function calculate() {
+                if (operation === null || previousInput === '') return;
+                
+                let result;
+                const prev = parseFloat(previousInput);
+                const current = parseFloat(currentInput);
+                
+                if (isNaN(prev) || isNaN(current)) return;
+                
+                switch (operation) {
+                    case '+':
+                        result = prev + current;
+                        break;
+                    case '-':
+                        result = prev - current;
+                        break;
+                    case '×':
+                        result = prev * current;
+                        break;
+                    case '÷':
+                        if (current === 0) {
+                            currentInput = 'Error';
+                            updateDisplay();
+                            return;
+                        }
+                        result = prev / current;
+                        break;
+                    default:
+                        return;
+                }
+                
+                // Round to avoid floating point precision issues
+                result = Math.round((result + Number.EPSILON) * 100000000) / 100000000;
+                
+                currentInput = result.toString();
+                operation = null;
+                previousInput = '';
+                resetOnNextInput = true;
+                
+                updateDisplay();
+            }
+            
+            // Handle number input
+            function handleNumberInput(input) {
+                if (resetOnNextInput) {
+                    currentInput = input;
+                    resetOnNextInput = false;
+                } else {
+                    currentInput = currentInput === '0' ? input : currentInput + input;
+                }
+                updateDisplay();
+            }
+            
+            // Handle decimal point
+            function handleDecimal() {
+                if (resetOnNextInput) {
+                    currentInput = '0.';
+                    resetOnNextInput = false;
+                    updateDisplay();
+                    return;
+                }
+                
+                if (!currentInput.includes('.')) {
+                    currentInput += '.';
+                    updateDisplay();
+                }
+            }
+            
+            // Handle operators
+            function handleOperator(op) {
+                if (currentInput === 'Error') return;
+                
+                if (previousInput !== '') {
+                    calculate();
+                }
+                
+                operation = op;
+                previousInput = currentInput;
+                resetOnNextInput = true;
+            }
+            
+            // Handle percentage
+            function handlePercentage() {
+                if (currentInput === 'Error') return;
+                
+                const currentValue = parseFloat(currentInput);
+                if (isNaN(currentValue)) return;
+                
+                currentInput = (currentValue / 100).toString();
+                updateDisplay();
+            }
+            
+            // Handle sign change
+            function handleSignChange() {
+                if (currentInput === 'Error') return;
+                
+                if (currentInput !== '0') {
+                    currentInput = currentInput.startsWith('-') ? currentInput.slice(1) : '-' + currentInput;
+                    updateDisplay();
+                }
+            }
+            
+            // Event listeners for buttons
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const buttonText = button.textContent;
+                    
+                    // Number buttons
+                    if (!isNaN(buttonText) || buttonText === '.') {
+                        if (buttonText === '.') {
+                            handleDecimal();
+                        } else {
+                            handleNumberInput(buttonText);
+                        }
+                    }
+                    // Operator buttons
+                    else if (['+', '-', '×', '÷'].includes(buttonText)) {
+                        handleOperator(buttonText);
+                    }
+                    // Equals button
+                    else if (buttonText === '=') {
+                        calculate();
+                    }
+                    // Clear button
+                    else if (buttonText === 'C') {
+                        currentInput = '0';
+                        previousInput = '';
+                        operation = null;
+                        resetOnNextInput = false;
+                        updateDisplay();
+                    }
+                    // Percentage button
+                    else if (buttonText === '%') {
+                        handlePercentage();
+                    }
+                    // Sign change button
+                    else if (buttonText === '±') {
+                        handleSignChange();
+                    }
+                });
+            });
+            
+            // Initialize display
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
